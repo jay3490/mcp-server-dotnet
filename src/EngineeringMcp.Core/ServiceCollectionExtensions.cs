@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddOptions<DocsOptions>().Bind(configuration.GetSection(DocsOptions.SectionName));
         services.AddSingleton<DocsSandbox>();
         services.AddSingleton<DocumentStore>();
+        services.AddSingleton<DocsSearchService>();
 
         return services;
     }
