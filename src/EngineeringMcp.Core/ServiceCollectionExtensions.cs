@@ -1,4 +1,5 @@
 using EngineeringMcp.Configuration;
+using EngineeringMcp.Docs;
 using EngineeringMcp.Sql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SqlQueryService>();
         services.AddSingleton<SqlSchemaService>();
         services.AddSingleton<SqliteDemoSeeder>();
+
+        services.AddOptions<DocsOptions>().Bind(configuration.GetSection(DocsOptions.SectionName));
+        services.AddSingleton<DocsSandbox>();
+        services.AddSingleton<DocumentStore>();
 
         return services;
     }

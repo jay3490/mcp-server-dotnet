@@ -25,12 +25,7 @@ public sealed class TempDirectory : IDisposable
     {
         try
         {
-            foreach (var file in Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories))
-            {
-                // Git object files are read-only, which stops Directory.Delete on Windows.
-                File.SetAttributes(file, FileAttributes.Normal);
-            }
-
+            Prepare(new DirectoryInfo(Path));
             Directory.Delete(Path, recursive: true);
         }
         catch (IOException)
@@ -39,6 +34,29 @@ public sealed class TempDirectory : IDisposable
         }
         catch (UnauthorizedAccessException)
         {
+        }
+    }
+
+    /// <summary>
+    /// Removes links (without touching their targets) and clears read-only flags, which git sets
+    /// on object files and which stop <see cref="Directory.Delete(string, bool)"/> on Windows.
+    /// </summary>
+    private static void Prepare(DirectoryInfo directory)
+    {
+        foreach (var entry in directory.EnumerateFileSystemInfos())
+        {
+            if (entry.Attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
+                entry.Delete();
+            }
+            else if (entry is DirectoryInfo child)
+            {
+                Prepare(child);
+            }
+            else
+            {
+                entry.Attributes = FileAttributes.Normal;
+            }
         }
     }
 }
