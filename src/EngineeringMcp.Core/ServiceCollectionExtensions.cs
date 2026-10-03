@@ -1,5 +1,6 @@
 using EngineeringMcp.Configuration;
 using EngineeringMcp.Docs;
+using EngineeringMcp.Git;
 using EngineeringMcp.Sql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DocsSandbox>();
         services.AddSingleton<DocumentStore>();
         services.AddSingleton<DocsSearchService>();
+
+        services.AddOptions<GitOptions>().Bind(configuration.GetSection(GitOptions.SectionName));
+        services.AddSingleton<GitService>();
 
         return services;
     }
