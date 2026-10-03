@@ -1,6 +1,7 @@
 using EngineeringMcp.Configuration;
 using EngineeringMcp.Docs;
 using EngineeringMcp.Git;
+using EngineeringMcp.Health;
 using EngineeringMcp.Sql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,20 @@ public static class ServiceCollectionExtensions
 
         services.AddOptions<GitOptions>().Bind(configuration.GetSection(GitOptions.SectionName));
         services.AddSingleton<GitService>();
+
+        services.AddOptions<HealthCheckOptions>().Bind(configuration.GetSection(HealthCheckOptions.SectionName));
+        services.AddSingleton<HealthCheckService>();
+        services.AddHttpClient(HealthCheckService.HttpClientName, client =>
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("engineering-mcp-health/1.0");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+            {
+                // A redirect could point anywhere; report the 3xx instead of following it.
+                AllowAutoRedirect = false,
+                UseCookies = false,
+                ConnectTimeout = TimeSpan.FromSeconds(5),
+            });
 
         return services;
     }
