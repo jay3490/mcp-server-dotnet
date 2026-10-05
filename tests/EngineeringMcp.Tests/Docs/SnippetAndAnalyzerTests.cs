@@ -33,6 +33,12 @@ public class SnippetAndAnalyzerTests
     }
 
     [Fact]
+    public void Emphasis_markers_do_not_leave_gaps_before_punctuation()
+    {
+        Assert.Equal("the billing, ledger and flags.", TextAnalyzer.MarkdownToPlainText("the **billing**, `ledger` and *flags*."));
+    }
+
+    [Fact]
     public void Highlights_every_matching_word()
     {
         var snippet = SnippetBuilder.Build("Roll back the deploy. Rollbacks are fast.", ["rollback", "deploy"]);

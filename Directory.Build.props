@@ -9,6 +9,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <Version>0.1.0</Version>
     <Authors>jay3490</Authors>
     <Copyright>Copyright (c) 2026 jay3490</Copyright>
   </PropertyGroup>

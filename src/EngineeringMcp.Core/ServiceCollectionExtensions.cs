@@ -14,11 +14,33 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the data-access services behind the tools: SQL, docs, git and health checks.
     /// </summary>
-    public static IServiceCollection AddEngineeringData(this IServiceCollection services, IConfiguration configuration)
+    /// <param name="baseDirectory">
+    /// Directory that relative paths in configuration are resolved against. Defaults to the
+    /// application's base directory.
+    /// </param>
+    public static IServiceCollection AddEngineeringData(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string? baseDirectory = null)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        services.AddOptions<DatabaseOptions>().Bind(configuration.GetSection(DatabaseOptions.SectionName));
+        var root = baseDirectory ?? AppContext.BaseDirectory;
+
+        services.AddOptions<DatabaseOptions>()
+            .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .PostConfigure(o =>
+            {
+                if (o.Provider == SqlDialect.Sqlite)
+                {
+                    o.ConnectionString = PathResolution.ResolveSqliteConnectionString(o.ConnectionString, root);
+                }
+
+                if (o.SeedScript is not null)
+                {
+                    o.SeedScript = PathResolution.Resolve(o.SeedScript, root);
+                }
+            });
 
         services.AddSingleton<IReadOnlyDatabase>(sp =>
         {
@@ -33,12 +55,16 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SqlSchemaService>();
         services.AddSingleton<SqliteDemoSeeder>();
 
-        services.AddOptions<DocsOptions>().Bind(configuration.GetSection(DocsOptions.SectionName));
+        services.AddOptions<DocsOptions>()
+            .Bind(configuration.GetSection(DocsOptions.SectionName))
+            .PostConfigure(o => o.Root = PathResolution.Resolve(o.Root, root));
         services.AddSingleton<DocsSandbox>();
         services.AddSingleton<DocumentStore>();
         services.AddSingleton<DocsSearchService>();
 
-        services.AddOptions<GitOptions>().Bind(configuration.GetSection(GitOptions.SectionName));
+        services.AddOptions<GitOptions>()
+            .Bind(configuration.GetSection(GitOptions.SectionName))
+            .PostConfigure(o => o.RepositoryPath = PathResolution.Resolve(o.RepositoryPath, root));
         services.AddSingleton<GitService>();
 
         services.AddOptions<HealthCheckOptions>().Bind(configuration.GetSection(HealthCheckOptions.SectionName));

@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C1F8559
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EngineeringMcp.Tests", "tests\EngineeringMcp.Tests\EngineeringMcp.Tests.csproj", "{B5013C12-0D8A-40D5-8053-69271562F233}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EngineeringMcp.Stdio", "src\EngineeringMcp.Stdio\EngineeringMcp.Stdio.csproj", "{22374124-7450-4503-9D5C-57FFF5C755D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,9 +30,14 @@ Global
 		{B5013C12-0D8A-40D5-8053-69271562F233}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5013C12-0D8A-40D5-8053-69271562F233}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5013C12-0D8A-40D5-8053-69271562F233}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22374124-7450-4503-9D5C-57FFF5C755D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22374124-7450-4503-9D5C-57FFF5C755D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22374124-7450-4503-9D5C-57FFF5C755D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22374124-7450-4503-9D5C-57FFF5C755D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D3A54FA5-45C9-4DE3-8A20-D788D25C838E} = {56AA2FDF-22C3-4F67-BEE2-0F9412C01971}
 		{B5013C12-0D8A-40D5-8053-69271562F233} = {9C1F8559-C8D7-4586-87FC-2D6B482B7F77}
+		{22374124-7450-4503-9D5C-57FFF5C755D8} = {56AA2FDF-22C3-4F67-BEE2-0F9412C01971}
 	EndGlobalSection
 EndGlobal

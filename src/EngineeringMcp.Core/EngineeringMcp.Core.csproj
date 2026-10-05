@@ -10,6 +10,9 @@
     <PackageReference Include="Npgsql" />
     <PackageReference Include="LibGit2Sharp" />
     <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 
   <ItemGroup>

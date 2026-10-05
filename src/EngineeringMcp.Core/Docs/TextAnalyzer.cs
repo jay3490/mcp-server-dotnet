@@ -65,7 +65,18 @@ public static partial class TextAnalyzer
         var builder = new StringBuilder(text.Length);
         foreach (var c in text)
         {
-            builder.Append(c is '#' or '*' or '`' or '|' or '>' ? ' ' : c);
+            switch (c)
+            {
+                case '*' or '`':
+                    // Emphasis and code markers hug the word, so drop them without leaving a gap.
+                    break;
+                case '#' or '|' or '>':
+                    builder.Append(' ');
+                    break;
+                default:
+                    builder.Append(c);
+                    break;
+            }
         }
 
         return WhitespacePattern().Replace(builder.ToString(), " ").Trim();
