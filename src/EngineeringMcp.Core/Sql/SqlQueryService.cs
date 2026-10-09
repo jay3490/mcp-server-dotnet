@@ -70,6 +70,11 @@ public sealed class SqlQueryService(IReadOnlyDatabase database, IOptions<Databas
                 $"Query did not finish within {timeout.TotalSeconds:0.#} seconds and was cancelled.",
                 ex);
         }
+        catch (Exception ex) when (ex is not OperationCanceledException && cancellationToken.IsCancellationRequested)
+        {
+            // The caller (for example the per-tool time limit) gave up; report it as cancellation.
+            throw new OperationCanceledException("The query was cancelled by the caller.", ex, cancellationToken);
+        }
         catch (DbException ex)
         {
             throw new ToolErrorException(ToolErrorCode.QueryFailed, $"The database reported an error: {ex.Message}", ex);

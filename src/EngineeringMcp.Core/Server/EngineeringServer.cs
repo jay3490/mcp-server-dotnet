@@ -29,13 +29,36 @@ public static class EngineeringServer
         options.ServerInstructions = Instructions;
     }
 
-    /// <summary>Registers every tool. Call after choosing a transport.</summary>
+    /// <summary>
+    /// Registers every tool plus the filters that hide disabled tools from <c>tools/list</c> and
+    /// run each <c>tools/call</c> through <see cref="ToolCallPipeline"/>. Call after choosing a
+    /// transport; the services come from <c>AddEngineeringData</c>.
+    /// </summary>
     public static IMcpServerBuilder WithEngineeringTools(this IMcpServerBuilder builder)
     {
         return builder
             .WithTools<SqlTools>()
             .WithTools<DocsTools>()
             .WithTools<GitTools>()
-            .WithTools<HealthTools>();
+            .WithTools<HealthTools>()
+            .WithRequestFilters(filters =>
+            {
+                filters.AddListToolsFilter(next => async (context, cancellationToken) =>
+                {
+                    var result = await next(context, cancellationToken).ConfigureAwait(false);
+                    var policy = Resolve<ToolPolicy>(context.Services ?? context.Server.Services);
+                    result.Tools = result.Tools.Where(t => policy.IsAllowed(t.Name)).ToList();
+                    return result;
+                });
+
+                filters.AddCallToolFilter(next => (context, cancellationToken) =>
+                    Resolve<ToolCallPipeline>(context.Services ?? context.Server.Services)
+                        .InvokeAsync(next, context, cancellationToken));
+            });
     }
+
+    private static T Resolve<T>(IServiceProvider? services)
+        where T : notnull =>
+        (services ?? throw new InvalidOperationException("The MCP request has no service provider."))
+            .GetRequiredService<T>();
 }

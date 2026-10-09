@@ -96,6 +96,10 @@ public sealed class SqlSchemaService(IReadOnlyDatabase database, IOptions<Databa
         {
             throw new ToolErrorException(ToolErrorCode.Timeout, "Reading the schema timed out.", ex);
         }
+        catch (Exception ex) when (ex is not OperationCanceledException && cancellationToken.IsCancellationRequested)
+        {
+            throw new OperationCanceledException("Reading the schema was cancelled by the caller.", ex, cancellationToken);
+        }
         catch (DbException ex)
         {
             throw new ToolErrorException(ToolErrorCode.QueryFailed, $"Could not read the schema: {ex.Message}", ex);

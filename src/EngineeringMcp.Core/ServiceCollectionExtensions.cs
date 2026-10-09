@@ -2,6 +2,7 @@ using EngineeringMcp.Configuration;
 using EngineeringMcp.Docs;
 using EngineeringMcp.Git;
 using EngineeringMcp.Health;
+using EngineeringMcp.Server;
 using EngineeringMcp.Sql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +81,15 @@ public static class ServiceCollectionExtensions
                 UseCookies = false,
                 ConnectTimeout = TimeSpan.FromSeconds(5),
             });
+
+        services.AddOptions<ToolPolicyOptions>()
+            .Bind(configuration.GetSection(ToolPolicyOptions.SectionName))
+            .ValidateOnStart();
+        services.AddSingleton<IValidateOptions<ToolPolicyOptions>, ToolPolicyOptionsValidator>();
+        services.AddOptions<AuditOptions>().Bind(configuration.GetSection(AuditOptions.SectionName));
+        services.AddSingleton<ToolPolicy>();
+        services.AddSingleton<ToolAuditLog>();
+        services.AddSingleton<ToolCallPipeline>();
 
         return services;
     }
