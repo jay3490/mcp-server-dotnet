@@ -24,7 +24,7 @@ builder.Services.AddEngineeringData(builder.Configuration);
 builder.Services
     .AddMcpServer(EngineeringServer.ConfigureOptions)
     .WithStdioServerTransport()
-    .WithEngineeringTools();
+    .WithEngineeringData();
 
 using var host = builder.Build();
 host.Services.GetRequiredService<SqliteDemoSeeder>().EnsureCreated();

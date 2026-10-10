@@ -53,6 +53,7 @@ public sealed class DocsTools(DocsSearchService search, DocumentStore store)
                 title = doc.Title,
                 length = doc.Length,
                 lastModifiedUtc = doc.LastWriteTimeUtc,
+                uri = DocUris.ToUri(doc.Path),
             });
         });
     }
