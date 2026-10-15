@@ -18,7 +18,9 @@ var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
 // stdout carries the JSON-RPC stream, so the default console logger has to go and every log line
 // is sent to stderr instead.
 builder.Logging.ClearProviders();
-builder.Services.AddSerilog((_, logger) => logger.ConfigureEngineeringLogging(builder.Configuration, consoleToStandardError: true));
+builder.Services.AddSerilog(
+    (_, logger) => logger.ConfigureEngineeringLogging(builder.Configuration, consoleToStandardError: true),
+    preserveStaticLogger: true);
 
 builder.Services.AddEngineeringData(builder.Configuration);
 builder.Services

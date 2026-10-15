@@ -5,32 +5,41 @@ using Microsoft.Extensions.Options;
 
 namespace EngineeringMcp.Tests.Git;
 
-public sealed class GitServiceTests : IDisposable
+/// <summary>One repository with a known four-commit history, shared by every test in the class.</summary>
+public sealed class GitHistoryFixture : IDisposable
 {
-    private readonly TempGitRepository _repo = new();
-    private readonly string[] _shas;
-
-    public GitServiceTests()
+    public GitHistoryFixture()
     {
-        _repo.Write("README.md", "# Demo\n");
-        var first = _repo.Commit("docs: add readme");
+        Repository.Write("README.md", "# Demo\n");
+        var first = Repository.Commit("docs: add readme");
 
-        _repo.Write("src/app.cs", "class App\n{\n}\n");
-        _repo.Write("README.md", "# Demo\n\nNow with an app.\n");
-        var second = _repo.Commit("feat: add app", author: "Sam Reviewer");
+        Repository.Write("src/app.cs", "class App\n{\n}\n");
+        Repository.Write("README.md", "# Demo\n\nNow with an app.\n");
+        var second = Repository.Commit("feat: add app", author: "Sam Reviewer");
 
-        _repo.Move("src/app.cs", "src/program.cs");
-        _repo.Write("notes.txt", "line one\nline two\n");
-        var third = _repo.Commit("refactor: rename app\n\nLonger body that is not part of the subject.");
+        Repository.Move("src/app.cs", "src/program.cs");
+        Repository.Write("notes.txt", "line one\nline two\n");
+        var third = Repository.Commit("refactor: rename app\n\nLonger body that is not part of the subject.");
 
-        _repo.Delete("notes.txt");
-        _repo.Write("src/program.cs", "class App\n{\n    static void Main() { }\n}\n");
-        var fourth = _repo.Commit("feat: add entry point");
+        Repository.Delete("notes.txt");
+        Repository.Write("src/program.cs", "class App\n{\n    static void Main() { }\n}\n");
+        var fourth = Repository.Commit("feat: add entry point");
 
-        _shas = [first, second, third, fourth];
+        Shas = [first, second, third, fourth];
     }
 
-    public void Dispose() => _repo.Dispose();
+    public TempGitRepository Repository { get; } = new();
+
+    /// <summary>Commit hashes, oldest first.</summary>
+    public string[] Shas { get; }
+
+    public void Dispose() => Repository.Dispose();
+}
+
+public sealed class GitServiceTests(GitHistoryFixture history) : IClassFixture<GitHistoryFixture>
+{
+    private readonly TempGitRepository _repo = history.Repository;
+    private readonly string[] _shas = history.Shas;
 
     private GitService CreateService(int maxCommits = 50, int maxDiffFiles = 200) =>
         new(Options.Create(new GitOptions { RepositoryPath = _repo.Path, MaxCommits = maxCommits, MaxDiffFiles = maxDiffFiles }));
